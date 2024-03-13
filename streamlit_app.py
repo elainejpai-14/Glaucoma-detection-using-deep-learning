@@ -23,7 +23,7 @@ def predict_glaucoma(image, classifier):
 background_image_url = "https://cdn-prod.medicalnewstoday.com/content/images/articles/326/326753/an-ophthalmologist-doing-eye-surgery.jpg"
 
 # Load pretrained model
-classifier = load_model("C:\Users\Elaine M Paily\Downloads\combinee_cnn.h5")
+classifier = load_model("C:\\Users\\Elaine M Paily\\Downloads\\combinee_cnn.h5")
 
 # Set background image using HTML
 background_image_style = f"""
