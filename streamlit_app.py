@@ -6,7 +6,7 @@ import streamlit as st
 from PIL import Image
 import numpy as np
 import pandas as pd
-from keras.models import load_model
+from tensorflow.keras.models import load_model
 import gdown
 
 # Function to load and preprocess image
