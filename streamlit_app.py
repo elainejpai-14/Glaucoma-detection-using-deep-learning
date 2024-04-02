@@ -26,7 +26,7 @@ def predict_glaucoma(image, classifier):
         return "Normal"
 
 # Define the background image URL
-background_image_url = "https://cdcssl.ibsrv.net/ibimg/smb/654x436_80/webmgr/07/d/l/shutterstock_475175770.jpg.webp?812655164adcac539a96922aa296d8dd"
+background_image_url = "https://img.freepik.com/free-photo/security-access-technologythe-scanner-decodes-retinal-data_587448-5015.jpg"
 
 # Set background image using HTML
 background_image_style = f"""
