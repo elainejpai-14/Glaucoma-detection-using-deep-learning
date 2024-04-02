@@ -46,7 +46,7 @@ st.markdown(background_image_style, unsafe_allow_html=True)
 # Set title color using HTML
 st.markdown("<h1 style='color: black;'>Glaucoma Detection App</h1>", unsafe_allow_html=True)
 st.markdown("---")
-st.markdown("<p style='color: black;'>This is a simple image classification web application to predict glaucoma through the fundus images of the eye. <strong><em>Please upload only fundus images.</em></strong></p>", unsafe_allow_html=True)
+st.markdown("<p style='color: white;'>This is a simple image classification web application to predict glaucoma through the fundus images of the eye. <strong><em>Please upload only fundus images.</em></strong></p>", unsafe_allow_html=True)
 
 # Initialize empty DataFrame for results
 all_results = pd.DataFrame(columns=["Image", "Prediction"])
