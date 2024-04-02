@@ -1,9 +1,14 @@
+import subprocess
+
+# Install dependencies from requirements.txt file
+subprocess.run(['pip', 'install', '-r', 'requirements.txt'])
 import streamlit as st
 from PIL import Image
 import numpy as np
 import pandas as pd
 from keras.models import load_model
 import matplotlib.pyplot as plt
+import gdown
 
 # Function to load and preprocess image
 def preprocess_image(image):
