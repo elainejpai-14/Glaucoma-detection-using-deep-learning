@@ -55,11 +55,10 @@ all_results = pd.DataFrame(columns=["Image", "Prediction"])
 # Sidebar for uploading image
 uploaded_file = st.file_uploader("Upload Image", type=["png", "jpg", "jpeg"], accept_multiple_files=False, key="file_uploader", help="Upload an image for glaucoma detection (Max size: 200 MB)")
 
-# Load pretrained model from Google Drive
-model_file_id = '1lhBtxhP18L-KA7wDh4N72xTHZMLUZT82'
-model_url = f'https://drive.google.com/uc?id={model_file_id}'
+# Load pretrained model from One Drive
+onedrive_model_url = 'https://1drv.ms/u/s!Amlx7LUtQu4WiV2Do1nyIhsD3Ts6?e=kd9BD3'
 local_model_path = 'combinee_cnn.h5'
-gdown.download(model_url, local_model_path, quiet=False)
+gdown.download(onedrive_model_url, local_model_path, quiet=False)
 classifier = load_model(local_model_path)
 
 # Main content area
