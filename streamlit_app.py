@@ -1,13 +1,9 @@
-import subprocess
-
-# Install dependencies from requirements.txt file
-subprocess.run(['pip', 'install', '-r', 'requirements.txt'])
 import streamlit as st
 from PIL import Image
 import numpy as np
 import pandas as pd
-from tensorflow.keras.models import load_model
-import gdown
+from keras.models import load_model
+import matplotlib.pyplot as plt
 
 # Function to load and preprocess image
 def preprocess_image(image):
@@ -26,34 +22,28 @@ def predict_glaucoma(image, classifier):
 
 # Define the background image URL
 background_image_url = "https://cdcssl.ibsrv.net/ibimg/smb/654x436_80/webmgr/07/d/l/shutterstock_475175770.jpg.webp?812655164adcac539a96922aa296d8dd"
-# Set background image using HTML
-background_image_style = f"""
+# Set background color and text color for dark mode
+st.markdown(
+    """
     <style>
-    .stApp {{
-        background-image: url("{background_image_url}");
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center;
-        height: 100vh;  /* Adjust the height as needed */
-        width: 100vw;   /* Adjust the width as needed */
-    }}
+    .stApp {
+        background-color: #2c3e50; /* Dark background color */
+        color: #ecf0f1; /* Light text color */
+    }
     </style>
-"""
+    """,
+    unsafe_allow_html=True
+)
 
-# Display background image using HTML
-st.markdown(background_image_style, unsafe_allow_html=True)
-
-# Set title color using HTML
-st.markdown("<h1 style='color: black;'>Glaucoma Detection App</h1>", unsafe_allow_html=True)
+# Set title in dark mode
+st.markdown("<h1 style='text-align: center; color: #ecf0f1;'>GlaucoGuard: Gaining Clarity in Glaucoma diagnosis through Deep Learning</h1>", unsafe_allow_html=True)
 st.markdown("---")
-st.markdown("<p style='color: black;'><strong>This is a simple image classification web application to predict glaucoma through the fundus images of the eye. <em>Please upload only fundus images.</em></strong></p>", unsafe_allow_html=True)
 
 # Initialize empty DataFrame for results
 all_results = pd.DataFrame(columns=["Image", "Prediction"])
 
-# Sidebar
-st.sidebar.title("Upload Image")
-uploaded_file = st.sidebar.file_uploader("Choose an image...", type=["png", "jpg", "jpeg"], accept_multiple_files=False, key="file_uploader", help="Upload an image for glaucoma detection (Max size: 200 MB)")
+# Sidebar for uploading image
+uploaded_file = st.file_uploader("Upload Image", type=["png", "jpg", "jpeg"], accept_multiple_files=False, key="file_uploader", help="Upload an image for glaucoma detection (Max size: 200 MB)")
 
 # Load pretrained model from Google Drive
 model_file_id = '1lhBtxhP18L-KA7wDh4N72xTHZMLUZT82'
@@ -62,54 +52,59 @@ local_model_path = 'combinee_cnn.h5'
 gdown.download(model_url, local_model_path, quiet=False)
 classifier = load_model(local_model_path)
 
-# Main content
+# Main content area
 if uploaded_file is not None:
-    st.sidebar.image(uploaded_file, caption="Uploaded Image", use_column_width=True)  # Change text color to black
-    st.markdown("---")
-
     # Display uploaded image
     original_image = Image.open(uploaded_file)
-    st.image(original_image, use_column_width=True)
-    st.markdown("<p style='color: black; text-align: center;'>Uploaded Image</p>", unsafe_allow_html=True)
-
+    st.image(original_image, caption="Uploaded Image", use_column_width=True)
+    
     # Perform glaucoma detection
     with st.spinner("Detecting glaucoma..."):
         processed_image = preprocess_image(original_image)
         prediction = predict_glaucoma(processed_image, classifier)
+
+    # Customize messages based on prediction
     if prediction == "Glaucoma":
-        st.markdown("<p style='color: black; background-color: lightgreen; padding: 10px;'>Your eye is diagnosed with Glaucoma , Please Consult an opthalmologist as soon as possible!</p>", unsafe_allow_html=True)
+        st.error("Your eye is diagnosed with Glaucoma. Please consult an ophthalmologist.")
     else:
-        st.markdown("<p style='color: black; background-color: lightgreen; padding: 10px;'>Your eyes are healthy.</p>", unsafe_allow_html=True)
+        st.success("Your eyes are healthy.")
 
     # Add new result to DataFrame
-    new_result = pd.DataFrame({"Image": ["Uploaded Image"], "Prediction": [prediction]})
+    new_result = pd.DataFrame({"Image": [uploaded_file.name], "Prediction": [prediction]})
     all_results = pd.concat([new_result, all_results], ignore_index=True)
 
 # Display all results in table
 if not all_results.empty:
     st.markdown("---")
-    st.markdown("<h3 style='color: black;'>Detection Results</h3>", unsafe_allow_html=True)
-    table_style = {
-        'selector': 'table',
-        'props': [
-            ('border-collapse', 'collapse'),
-            ('border', '2px solid black'),  # Adjust the width and style of the border
-        ]
-    }
-    cell_style = {
-        'selector': 'td, th',
-        'props': [
-            ('color', 'black'),  # Set text color to black
-            ('background-color', 'yellow'),  # Set background color to yellow
-        ]
-    }
-    header_style = {
-        'selector': 'th',  # Target th elements (column headers)
-        'props': [
-            ('font-weight', 'bold')  # Make text bold
-        ]
-    }
-    all_results_styled = all_results.style.set_table_styles([table_style, cell_style]).set_table_styles([header_style], overwrite=False)
-    st.table(all_results_styled)
+    st.subheader("Detection Results")
+    st.table(all_results)
+
+    # Pie chart
+    st.markdown("### Pie Chart")
+    pie_data = all_results['Prediction'].value_counts()
+    fig, ax = plt.subplots()
+    ax.pie(pie_data, labels=pie_data.index, autopct='%1.1f%%', startangle=90)
+    ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+    st.pyplot(fig)
+
+    # Bar chart
+    st.markdown("### Bar Chart")
+    bar_data = all_results['Prediction'].value_counts()
+    fig, ax = plt.subplots()
+    ax.bar(bar_data.index, bar_data)
+    ax.set_xlabel('Prediction')
+    ax.set_ylabel('Count')
+    st.pyplot(fig)
+
+    # Option to download prediction report
+    st.markdown("---")
+    st.subheader("Download Prediction Report")
+    csv = all_results.to_csv(index=False)
+    st.download_button(
+        label="Download CSV",
+        data=csv,
+        file_name="prediction_report.csv",
+        mime="text/csv"
+    )
 else:
-    st.markdown("<p style='color: black; background-color: lightcoral; padding: 10px;'>No images uploaded yet.</p>", unsafe_allow_html=True)
+    st.warning("No images uploaded yet.")
