@@ -8,7 +8,8 @@ import numpy as np
 import pandas as pd
 from tensorflow.keras.models import load_model
 import matplotlib.pyplot as plt
-
+import requests
+        
 # Function to load and preprocess image
 def preprocess_image(image):
     processed_image = np.array(image.resize((256, 256)))  # Resize to model input size
@@ -54,7 +55,17 @@ all_results = pd.DataFrame(columns=["Image", "Prediction"])
 # Sidebar for uploading image
 uploaded_file = st.file_uploader("Upload Image", type=["png", "jpg", "jpeg"], accept_multiple_files=False, key="file_uploader", help="Upload an image for glaucoma detection (Max size: 200 MB)")
 
-# Load pretrained model from One Drive
+# Download model from MediaFire
+model_url = 'https://www.mediafire.com/file/your_model_file_link.h5/file'  # Replace with your actual MediaFire model file link
+local_model_path = 'combinee_cnn.h5'
+
+# Download the model file from MediaFire
+response = requests.get(model_url)
+with open(local_model_path, 'wb') as f:
+    f.write(response.content)
+
+# Load the model
+classifier = load_model(local_model_path)
 
 # Main content area
 if uploaded_file is not None:
