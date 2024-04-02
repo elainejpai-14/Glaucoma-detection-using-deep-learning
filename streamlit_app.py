@@ -28,29 +28,22 @@ def predict_glaucoma(image, classifier):
 # Define the background image URL
 background_image_url = "https://cdcssl.ibsrv.net/ibimg/smb/654x436_80/webmgr/07/d/l/shutterstock_475175770.jpg.webp?812655164adcac539a96922aa296d8dd"
 
-# Set background color and text color for dark mode
-st.markdown(
-    """
-   <style>
-    .stApp {
-        background-color: #2c3e50; /* Dark background color */
-        color: #ecf0f1; /* Light text color */
-    }
-    .stApp:before {
-        content: "";
-        background: url('%s');
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-        opacity: 0.5; /* Adjust opacity as needed */
-    }
+# Set background image using HTML
+background_image_style = f"""
+    <style>
+    .stApp {{
+        background-image: url("{background_image_url}");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        height: 100vh;  /* Adjust the height as needed */
+        width: 100vw;   /* Adjust the width as needed */
+    }}
     </style>
-    """ % background_image_url,
-    unsafe_allow_html=True
-)
+"""
+
+# Display background image using HTML
+st.markdown(background_image_style, unsafe_allow_html=True)
 
 # Set title in dark mode
 st.markdown("<h1 style='text-align: center; color: #ecf0f1;'>GlaucoGuard: Gaining Clarity in Glaucoma diagnosis through Deep Learning</h1>", unsafe_allow_html=True)
