@@ -1,3 +1,7 @@
+import subprocess
+
+# Install dependencies from requirements.txt file
+subprocess.run(['pip', 'install', '-r', 'requirements.txt'])
 import streamlit as st
 from PIL import Image
 import numpy as np
