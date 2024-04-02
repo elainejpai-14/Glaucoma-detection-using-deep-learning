@@ -4,3 +4,5 @@ pandas
 Pillow
 keras
 tensorflow
+gdown
+python
