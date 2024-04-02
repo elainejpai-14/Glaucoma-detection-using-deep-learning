@@ -68,9 +68,9 @@ mediafire_model_url = 'https://www.mediafire.com/file/fcqspih00jyqaci/combinee_c
 # Download the model file from MediaFire
 model_file = download_model_from_mediafire(mediafire_model_url)
 
-# Load the model
+# Load the model as an inference-only layer
 try:
-    classifier = load_model(model_file)
+    classifier = tf.keras.layers.TFSavedModel(model_file, call_endpoint='serving_default')
 except Exception as e:
     st.error(f"Error loading the model: {e}")
     
