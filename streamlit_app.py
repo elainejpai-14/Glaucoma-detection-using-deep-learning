@@ -46,6 +46,7 @@ st.markdown(background_image_style, unsafe_allow_html=True)
 # Set title color using HTML
 st.markdown("<h1 style='color: black;'>Glaucoma Detection App</h1>", unsafe_allow_html=True)
 st.markdown("---")
+st.markdown("<p style='color: black;'>This is a simple image classification web application to predict glaucoma through the fundus images of the eye. <strong><em>Please upload only fundus images.</em></strong></p>", unsafe_allow_html=True)
 
 # Initialize empty DataFrame for results
 all_results = pd.DataFrame(columns=["Image", "Prediction"])
@@ -76,9 +77,9 @@ if uploaded_file is not None:
         processed_image = preprocess_image(original_image)
         prediction = predict_glaucoma(processed_image, classifier)
     if prediction == "Glaucoma":
-        st.markdown("<p style='color: black; background-color: lightgreen; padding: 10px;'>Glaucoma detected!</p>", unsafe_allow_html=True)
+        st.markdown("<p style='color: black; background-color: lightgreen; padding: 10px;'>Your eye is diagnosed with Glaucoma , Please Consult an opthalmologist as soon as possible!</p>", unsafe_allow_html=True)
     else:
-        st.markdown("<p style='color: black; background-color: lightgreen; padding: 10px;'>No glaucoma detected.</p>", unsafe_allow_html=True)
+        st.markdown("<p style='color: black; background-color: lightgreen; padding: 10px;'>Your eyes are healthy.</p>", unsafe_allow_html=True)
 
     # Add new result to DataFrame
     new_result = pd.DataFrame({"Image": ["Uploaded Image"], "Prediction": [prediction]})
