@@ -10,14 +10,7 @@ import pandas as pd
 from tensorflow.keras.models import load_model
 import matplotlib.pyplot as plt
 import requests
-from io import BytesIO
 
-# Function to download the model file from MediaFire
-def download_model_from_mediafire(url):
-    response = requests.get(url)
-    model_file = BytesIO(response.content)
-    return model_file
-        
 # Function to load and preprocess image
 def preprocess_image(image):
     processed_image = np.array(image.resize((256, 256)))  # Resize to model input size
@@ -63,17 +56,17 @@ all_results = pd.DataFrame(columns=["Image", "Prediction"])
 # Sidebar for uploading image
 uploaded_file = st.file_uploader("Upload Image", type=["png", "jpg", "jpeg"], accept_multiple_files=False, key="file_uploader", help="Upload an image for glaucoma detection (Max size: 200 MB)")
 
-# Define the MediaFire direct download link for your model file
-mediafire_model_url = 'https://www.mediafire.com/file/fcqspih00jyqaci/combinee_cnn.h5/file'
+# Download model from MediaFire
+model_url = 'https://www.mediafire.com/file/fcqspih00jyqaci/combinee_cnn.h5/file'
+local_model_path = 'combinee_cnn.h5'
 
 # Download the model file from MediaFire
-model_file = download_model_from_mediafire(mediafire_model_url)
+response = requests.get(model_url)
+with open(local_model_path, 'wb') as f:
+    f.write(response.content)
 
-# Load the model as an inference-only layer
-try:
-    classifier = tf.keras.layers.TFSavedModel(model_file, call_endpoint='serving_default')
-except Exception as e:
-    st.error(f"Error loading the model: {e}")
+# Load the model
+model = tf.keras.models.load_model(local_model_path)
     
 # Main content area
 if uploaded_file is not None:
