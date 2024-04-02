@@ -20,8 +20,7 @@ def predict_glaucoma(image, classifier):
         return "Normal"
 
 # Define the background image URL
-background_image_url = "https://cdn-prod.medicalnewstoday.com/content/images/articles/326/326753/an-ophthalmologist-doing-eye-surgery.jpg"
-
+background_image_url = "https://cdcssl.ibsrv.net/ibimg/smb/654x436_80/webmgr/07/d/l/shutterstock_475175770.jpg.webp?812655164adcac539a96922aa296d8dd"
 # Load pretrained model
 classifier = load_model("C:\\Users\\Elaine M Paily\\Downloads\\combinee_cnn.h5")
 
@@ -84,14 +83,23 @@ if not all_results.empty:
         'selector': 'table',
         'props': [
             ('border-collapse', 'collapse'),
-            ('border', '2px solid black')  # Adjust the width and style of the border
+            ('border', '2px solid black'),  # Adjust the width and style of the border
         ]
     }
-    text_color_style = {
+    cell_style = {
         'selector': 'td, th',
-        'props': [('color', 'black')]
+        'props': [
+            ('color', 'black'),  # Set text color to black
+            ('background-color', 'yellow'),  # Set background color to yellow
+        ]
     }
-    all_results_styled = all_results.style.set_table_styles([table_style, text_color_style])
+    header_style = {
+        'selector': 'th',  # Target th elements (column headers)
+        'props': [
+            ('font-weight', 'bold')  # Make text bold
+        ]
+    }
+    all_results_styled = all_results.style.set_table_styles([table_style, cell_style]).set_table_styles([header_style], overwrite=False)
     st.table(all_results_styled)
 else:
     st.markdown("<p style='color: black; background-color: lightcoral; padding: 10px;'>No images uploaded yet.</p>", unsafe_allow_html=True)
