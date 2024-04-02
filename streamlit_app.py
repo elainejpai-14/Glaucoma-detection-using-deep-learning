@@ -6,9 +6,8 @@ import streamlit as st
 from PIL import Image
 import numpy as np
 import pandas as pd
-from keras.models import load_model
+from tensorflow.keras.models import load_model
 import matplotlib.pyplot as plt
-import requests
 
 # Function to load and preprocess image
 def preprocess_image(image):
@@ -56,23 +55,6 @@ all_results = pd.DataFrame(columns=["Image", "Prediction"])
 uploaded_file = st.file_uploader("Upload Image", type=["png", "jpg", "jpeg"], accept_multiple_files=False, key="file_uploader", help="Upload an image for glaucoma detection (Max size: 200 MB)")
 
 # Load pretrained model from One Drive
-onedrive_model_url = 'https://1drv.ms/u/s!Amlx7LUtQu4WiV2Do1nyIhsD3Ts6?e=kd9BD3'
-local_model_path = 'combinee_cnn.h5'
-# Download the model from OneDrive using requests
-response = requests.get(onedrive_model_url)
-if response.status_code == 200:
-    with open(local_model_path, 'wb') as f:
-        f.write(response.content)
-    st.success("Model downloaded successfully!")
-else:
-    st.error("Failed to download the model.")
-
-# Load the model in your Streamlit app
-try:
-    classifier = load_model(local_model_path)
-    st.success("Model loaded successfully!")
-except Exception as e:
-    st.error(f"Error loading model: {e}")
 
 # Main content area
 if uploaded_file is not None:
