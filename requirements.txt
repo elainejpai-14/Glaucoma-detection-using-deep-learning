@@ -1,6 +1,6 @@
-streamlit
-numpy
-pandas
-Pillow
-keras
-tensorflow
+streamlit==1.8.0
+numpy==1.21.0
+pandas==1.3.0
+Pillow==8.3.1
+keras==2.6.0
+tensorflow==2.6.0
