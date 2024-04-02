@@ -56,7 +56,7 @@ all_results = pd.DataFrame(columns=["Image", "Prediction"])
 uploaded_file = st.file_uploader("Upload Image", type=["png", "jpg", "jpeg"], accept_multiple_files=False, key="file_uploader", help="Upload an image for glaucoma detection (Max size: 200 MB)")
 
 # Download model from MediaFire
-model_url = 'https://www.mediafire.com/file/your_model_file_link.h5/file'  # Replace with your actual MediaFire model file link
+model_url = 'https://www.mediafire.com/file/fcqspih00jyqaci/combinee_cnn.h5/file'
 local_model_path = 'combinee_cnn.h5'
 
 # Download the model file from MediaFire
