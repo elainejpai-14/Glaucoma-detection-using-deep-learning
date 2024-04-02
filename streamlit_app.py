@@ -27,16 +27,28 @@ def predict_glaucoma(image, classifier):
 
 # Define the background image URL
 background_image_url = "https://cdcssl.ibsrv.net/ibimg/smb/654x436_80/webmgr/07/d/l/shutterstock_475175770.jpg.webp?812655164adcac539a96922aa296d8dd"
+
 # Set background color and text color for dark mode
 st.markdown(
     """
-    <style>
+   <style>
     .stApp {
         background-color: #2c3e50; /* Dark background color */
         color: #ecf0f1; /* Light text color */
     }
+    .stApp:before {
+        content: "";
+        background: url('%s');
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        opacity: 0.5; /* Adjust opacity as needed */
+    }
     </style>
-    """,
+    """ % background_image_url,
     unsafe_allow_html=True
 )
 
@@ -82,13 +94,13 @@ if uploaded_file is not None:
 if not all_results.empty:
     st.markdown("---")
     st.subheader("Detection Results")
-    st.table(all_results)
+    st.table(all_results.style.applymap(lambda x: 'color: red' if x == 'Glaucoma' else 'color: green', subset=['Prediction']))
 
     # Pie chart
     st.markdown("### Pie Chart")
     pie_data = all_results['Prediction'].value_counts()
     fig, ax = plt.subplots()
-    ax.pie(pie_data, labels=pie_data.index, autopct='%1.1f%%', startangle=90)
+    ax.pie(pie_data, labels=pie_data.index, autopct='%1.1f%%', startangle=90, colors=['red', 'green'])
     ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
     st.pyplot(fig)
 
@@ -96,7 +108,7 @@ if not all_results.empty:
     st.markdown("### Bar Chart")
     bar_data = all_results['Prediction'].value_counts()
     fig, ax = plt.subplots()
-    ax.bar(bar_data.index, bar_data)
+    ax.bar(bar_data.index, bar_data, color=['red', 'green'])
     ax.set_xlabel('Prediction')
     ax.set_ylabel('Count')
     st.pyplot(fig)
