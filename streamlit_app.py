@@ -3,6 +3,7 @@ from PIL import Image
 import numpy as np
 import pandas as pd
 from keras.models import load_model
+import gdown
 
 # Function to load and preprocess image
 def preprocess_image(image):
@@ -21,9 +22,6 @@ def predict_glaucoma(image, classifier):
 
 # Define the background image URL
 background_image_url = "https://cdcssl.ibsrv.net/ibimg/smb/654x436_80/webmgr/07/d/l/shutterstock_475175770.jpg.webp?812655164adcac539a96922aa296d8dd"
-# Load pretrained model
-classifier = load_model("C:\\Users\\Elaine M Paily\\Downloads\\combinee_cnn.h5")
-
 # Set background image using HTML
 background_image_style = f"""
     <style>
@@ -51,6 +49,13 @@ all_results = pd.DataFrame(columns=["Image", "Prediction"])
 # Sidebar
 st.sidebar.title("Upload Image")
 uploaded_file = st.sidebar.file_uploader("Choose an image...", type=["png", "jpg", "jpeg"], accept_multiple_files=False, key="file_uploader", help="Upload an image for glaucoma detection (Max size: 200 MB)")
+
+# Load pretrained model from Google Drive
+model_file_id = '1lhBtxhP18L-KA7wDh4N72xTHZMLUZT82'
+model_url = f'https://drive.google.com/uc?id={model_file_id}'
+local_model_path = 'combinee_cnn.h5'
+gdown.download(model_url, local_model_path, quiet=False)
+classifier = load_model(local_model_path)
 
 # Main content
 if uploaded_file is not None:
