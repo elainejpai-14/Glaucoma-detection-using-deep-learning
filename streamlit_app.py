@@ -25,23 +25,26 @@ def predict_glaucoma(image, classifier):
         return "Glaucoma"
     else:
         return "Normal"
-        
-# Define the background image URL
-background_image_url = "https://img.freepik.com/free-photo/security-access-technologythe-scanner-decodes-retinal-data_587448-5015.jpg"
 
-# File path to the downloaded model file
+# Check if model file exists, if not download it
 model_file_path = "combinee_cnn.h5"
-
-# Download the model file from GitHub
 model_url = "https://github.com/elainejpai-14/major-project/raw/main/combinee_cnn.h5"
-response = requests.get(model_url)
-if response.status_code == 200:
-    with open(model_file_path, 'wb') as f:
-        f.write(response.content)
+
+if not os.path.exists(model_file_path):
+    st.write("Downloading model file...")
+    response = requests.get(model_url)
+    if response.status_code == 200:
+        with open(model_file_path, 'wb') as f:
+            f.write(response.content)
+            st.write("Model file downloaded successfully.")
+    else:
+        st.error("Failed to download the model file.")
 
 # Load pretrained model
 try:
+    st.write("Loading the model...")
     classifier = load_model(model_file_path)
+    st.write("Model loaded successfully.")
 except Exception as e:
     st.error(f"Error loading the model: {str(e)}")
 
