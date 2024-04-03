@@ -22,15 +22,12 @@ def predict_glaucoma(image, classifier):
     else:
         return "Normal"
 
-# Google Drive file ID
-file_id = '1lhBtxhP18L-KA7wDh4N72xTHZMLUZT82'
-
 # Define the destination path for the model file
 model_path = 'combinee_cnn.h5'
 
 # Download the model file from Google Drive
 if not os.path.exists(model_path):
-    url = f'https://drive.google.com/uc?id={file_id}'
+    url = "https://drive.google.com/file/d/1lhBtxhP18L-KA7wDh4N72xTHZMLUZT82/view?usp=drive_link"
     gdown.download(url, model_path, quiet=False)
 
 # Load pretrained model
