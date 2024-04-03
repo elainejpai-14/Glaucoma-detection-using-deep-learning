@@ -28,7 +28,7 @@ def predict_glaucoma(image, classifier):
 # Load pretrained model from Google Drive
 @st.cache(allow_output_mutation=True)
 def load_google_drive_model(model_url):
-    model_path = tf.keras.utils.get_file('model.h5', model_url)
+    model_path = tf.keras.utils.get_file('combinee_cnn.h5', model_url)
     model = load_model(model_path)
     return model
 
