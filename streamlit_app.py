@@ -1,7 +1,3 @@
-import subprocess
-
-# Install dependencies from requirements.txt file
-subprocess.run(['pip', 'install', '-r', 'requirements.txt'])
 import streamlit as st
 import tensorflow as tf
 from PIL import Image
@@ -10,6 +6,7 @@ import pandas as pd
 from tensorflow.keras.models import load_model
 import matplotlib.pyplot as plt
 import gdown
+import os
 
 # Function to load and preprocess image
 def preprocess_image(image):
@@ -31,10 +28,19 @@ background_image_url = "https://img.freepik.com/free-photo/security-access-techn
 
 # Download model file from Google Drive using gdown
 model_url = "https://drive.google.com/uc?id=1lhBtxhP18L-KA7wDh4N72xTHZMLUZT82"
-gdown.download(model_url, "combinee_cnn.h5", quiet=False)
+model_file_path = "combinee_cnn.h5"
+
+if not os.path.isfile(model_file_path):
+    try:
+        gdown.download(model_url, model_file_path, quiet=False)
+    except Exception as e:
+        st.error(f"Error downloading the model file: {e}")
 
 # Load pretrained model
-classifier = load_model("combinee_cnn.h5")
+if os.path.isfile(model_file_path):
+    classifier = load_model(model_file_path)
+else:
+    st.error("Model file not found. Please check the download URL.")
 
 # Set background image using HTML
 background_image_style = f"""
@@ -127,20 +133,4 @@ if not all_results.empty:
     bar_data = all_results['Prediction'].value_counts()
     fig, ax = plt.subplots()
     colors = ['green' if label == 'Normal' else 'red' for label in bar_data.index]
-    ax.bar(bar_data.index, bar_data, color=colors)
-    ax.set_xlabel('Prediction')
-    ax.set_ylabel('Count')
-    st.pyplot(fig)
-
-    # Option to download prediction report
-    st.markdown("---")
-    st.subheader("Download Prediction Report")
-    csv = all_results.to_csv(index=False)
-    st.download_button(
-        label="Download CSV",
-        data=csv,
-        file_name="prediction_report.csv",
-        mime="text/csv"
-    )
-else:
-    st.markdown("<p class='yellow-bg'>No images uploaded yet.</p>", unsafe_allow_html=True)
+    ax.bar(bar_data.index, bar_data, color
