@@ -1,6 +1,6 @@
 import subprocess
 import streamlit as st
-import tensorflow as tf
+import requests
 from PIL import Image
 import numpy as np
 import pandas as pd
@@ -13,10 +13,22 @@ subprocess.run(['pip', 'install', '-r', 'requirements.txt'])
 # Define the background image URL
 background_image_url = "https://img.freepik.com/free-photo/security-access-technologythe-scanner-decodes-retinal-data_587448-5015.jpg"
 
-# File path to the uploaded model file
-model_file_path = "https://github.com/elainejpai-14/major-project/raw/main/combinee_cnn.h5"
+# File path to the downloaded model file
+model_file_path = "combinee_cnn.h5"  # Specify the local file path
 
-# Load the model with error handling
+# Function to download the model file
+def download_model_file(url, file_path):
+    response = requests.get(url)
+    with open(file_path, "wb") as f:
+        f.write(response.content)
+
+# Download the model file if not already downloaded
+if not os.path.isfile(model_file_path):
+    st.info("Downloading the model file...")
+    download_model_file("https://github.com/elainejpai-14/major-project/raw/main/combinee_cnn.h5", model_file_path)
+    st.success("Model file downloaded successfully.")
+
+# Load pretrained model
 try:
     classifier = load_model(model_file_path)
 except Exception as e:
@@ -120,13 +132,4 @@ if not all_results.empty:
 
     # Option to download prediction report
     st.markdown("---")
-    st.subheader("Download Prediction Report")
-    csv = all_results.to_csv(index=False)
-    st.download_button(
-        label="Download CSV",
-        data=csv,
-        file_name="prediction_report.csv",
-        mime="text/csv"
-    )
-else:
-    st.markdown("<p class='yellow-bg'>No images uploaded yet.</p>", unsafe_allow_html=True)
+    st.subheader
