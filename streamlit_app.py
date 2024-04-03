@@ -7,6 +7,7 @@ import pandas as pd
 from tensorflow.keras.models import load_model
 import matplotlib.pyplot as plt
 import gdown
+import os
 
 # Install dependencies from requirements.txt file
 subprocess.run(['pip', 'install', '-r', 'requirements.txt'])
