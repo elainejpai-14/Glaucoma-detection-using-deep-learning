@@ -29,7 +29,7 @@ def predict_glaucoma(image, classifier):
 background_image_url = "https://img.freepik.com/free-photo/security-access-technologythe-scanner-decodes-retinal-data_587448-5015.jpg"
 
 # Load pretrained model
-classifier = load_model("C:\\Users\\Elaine M Paily\\Downloads\\combinee_cnn.h5")
+classifier = load_model(r"C:\Users\Elaine M Paily\Downloads\combinee_cnn.h5")
 
 # Set background image using HTML
 background_image_style = f"""
