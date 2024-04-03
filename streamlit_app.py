@@ -9,7 +9,6 @@ import numpy as np
 import pandas as pd
 from tensorflow.keras.models import load_model
 import matplotlib.pyplot as plt
-import requests
 
 # Function to load and preprocess image
 def preprocess_image(image):
@@ -26,8 +25,19 @@ def predict_glaucoma(image, classifier):
     else:
         return "Normal"
 
+# Load pretrained model from Google Drive
+@st.cache(allow_output_mutation=True)
+def load_google_drive_model(model_url):
+    model_path = tf.keras.utils.get_file('model.h5', model_url)
+    model = load_model(model_path)
+    return model
+
 # Define the background image URL
 background_image_url = "https://img.freepik.com/free-photo/security-access-technologythe-scanner-decodes-retinal-data_587448-5015.jpg"
+
+# Load pretrained model from Google Drive
+model_url = "https://drive.google.com/file/d/1lhBtxhP18L-KA7wDh4N72xTHZMLUZT82/view?usp=drive_link"
+classifier = load_google_drive_model(model_url)
 
 # Set background image using HTML
 background_image_style = f"""
@@ -40,6 +50,24 @@ background_image_style = f"""
         height: 100vh;  /* Adjust the height as needed */
         width: 100vw;   /* Adjust the width as needed */
     }}
+    .red-bg {{
+        background-color: red;
+        padding: 10px;  /* Adjust the padding as needed */
+        margin: 10px;   /* Adjust the margin as needed */
+        color: white;   /* Text color */
+    }}
+    .green-bg {{
+        background-color: green;
+        padding: 10px;  /* Adjust the padding as needed */
+        margin: 10px;   /* Adjust the margin as needed */
+        color: white;   /* Text color */
+    }}
+    .yellow-bg {{
+        background-color: yellow;
+        padding: 10px;  /* Adjust the padding as needed */
+        margin: 10px;   /* Adjust the margin as needed */
+        color: black;   /* Text color */
+    }}
     </style>
 """
 
@@ -50,30 +78,23 @@ st.markdown(background_image_style, unsafe_allow_html=True)
 st.markdown("<h1 style='text-align: center; color: #ecf0f1;'>GlaucoGuard: Gaining Clarity in Glaucoma diagnosis through Deep Learning</h1>", unsafe_allow_html=True)
 st.markdown("---")
 
+# Paragraph with content about uploading fundus images
+st.markdown("""<p style='font-size: 20px; text-align: center; background-color: orange; color: black;'>This is a simple image classification web application to predict glaucoma through fundus images of the eye. <strong><em>Please upload fundus images only.</em></strong></p>""", unsafe_allow_html=True)
+
+st.markdown("---")
+
 # Initialize empty DataFrame for results
 all_results = pd.DataFrame(columns=["Image", "Prediction"])
 
 # Sidebar for uploading image
 uploaded_file = st.file_uploader("Upload Image", type=["png", "jpg", "jpeg"], accept_multiple_files=False, key="file_uploader", help="Upload an image for glaucoma detection (Max size: 200 MB)")
 
-# Download model from MediaFire
-model_url = 'https://www.mediafire.com/file/fcqspih00jyqaci/combinee_cnn.h5/file'
-local_model_path = 'combinee_cnn.h5'
-
-# Download the model file from MediaFire
-response = requests.get(model_url)
-with open(local_model_path, 'wb') as f:
-    f.write(response.content)
-
-# Load the model
-model = tf.keras.models.load_model(local_model_path)
-    
 # Main content area
 if uploaded_file is not None:
     # Display uploaded image
     original_image = Image.open(uploaded_file)
     st.image(original_image, caption="Uploaded Image", use_column_width=True)
-    
+
     # Perform glaucoma detection
     with st.spinner("Detecting glaucoma..."):
         processed_image = preprocess_image(original_image)
@@ -81,15 +102,15 @@ if uploaded_file is not None:
 
     # Customize messages based on prediction
     if prediction == "Glaucoma":
-        st.error("Your eye is diagnosed with Glaucoma. Please consult an ophthalmologist.")
+        st.markdown("<p class='red-bg'>Your eye is diagnosed with Glaucoma. Please consult an ophthalmologist.</p>", unsafe_allow_html=True)
     else:
-        st.success("Your eyes are healthy.")
+        st.markdown("<p class='green-bg'>Your eyes are healthy.</p>", unsafe_allow_html=True)
 
     # Add new result to DataFrame
     new_result = pd.DataFrame({"Image": [uploaded_file.name], "Prediction": [prediction]})
     all_results = pd.concat([new_result, all_results], ignore_index=True)
 
-# Display all results in table
+# Display all results in table with black background color
 if not all_results.empty:
     st.markdown("---")
     st.subheader("Detection Results")
@@ -99,7 +120,8 @@ if not all_results.empty:
     st.markdown("### Pie Chart")
     pie_data = all_results['Prediction'].value_counts()
     fig, ax = plt.subplots()
-    ax.pie(pie_data, labels=pie_data.index, autopct='%1.1f%%', startangle=90, colors=['red', 'green'])
+    colors = ['green' if label == 'Normal' else 'red' for label in pie_data.index]
+    ax.pie(pie_data, labels=pie_data.index, autopct='%1.1f%%', startangle=90, colors=colors)
     ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
     st.pyplot(fig)
 
@@ -107,7 +129,8 @@ if not all_results.empty:
     st.markdown("### Bar Chart")
     bar_data = all_results['Prediction'].value_counts()
     fig, ax = plt.subplots()
-    ax.bar(bar_data.index, bar_data, color=['red', 'green'])
+    colors = ['green' if label == 'Normal' else 'red' for label in bar_data.index]
+    ax.bar(bar_data.index, bar_data, color=colors)
     ax.set_xlabel('Prediction')
     ax.set_ylabel('Count')
     st.pyplot(fig)
@@ -123,4 +146,4 @@ if not all_results.empty:
         mime="text/csv"
     )
 else:
-    st.warning("No images uploaded yet.")
+    st.markdown("<p class='yellow-bg'>No images uploaded yet.</p>", unsafe_allow_html=True)
