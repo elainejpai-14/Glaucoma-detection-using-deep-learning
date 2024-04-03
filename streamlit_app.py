@@ -16,10 +16,6 @@ background_image_url = "https://img.freepik.com/free-photo/security-access-techn
 # File path to the uploaded model file
 model_file_path = "https://github.com/elainejpai-14/major-project/raw/main/combinee_cnn.h5"
 
-
-# Load pretrained model
-classifier = load_model(model_file_path)
-
 # Load the model with error handling
 try:
     classifier = load_model(model_file_path)
