@@ -8,8 +8,6 @@ import requests
 from tensorflow.keras.models import load_model
 import matplotlib.pyplot as plt
 
-import tensorflow as tf
-
 # Set memory growth for GPU
 gpus = tf.config.experimental.list_physical_devices('GPU')
 if gpus:
