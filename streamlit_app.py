@@ -27,13 +27,15 @@ def predict_glaucoma(image, classifier):
         return "Normal"
 
 # Download the model from Google Drive
-def download_model_from_google_drive(model_url, destination):
+def download_model_from_google_drive(model_url):
     session = requests.Session()
     response = session.get(model_url, stream=True)
-    with open(destination, "wb") as f:
+    temp_model_path = "temp_model.h5"  # Temporary file path
+    with open(temp_model_path, "wb") as f:
         for chunk in response.iter_content(chunk_size=1024):
             if chunk:
                 f.write(chunk)
+    return temp_model_path
 
 # Load pretrained model
 @st.cache(allow_output_mutation=True)
@@ -46,9 +48,8 @@ background_image_url = "https://img.freepik.com/free-photo/security-access-techn
 
 # Load pretrained model from Google Drive
 model_url = "https://drive.google.com/uc?export=download&id=1lhBtxhP18L-KA7wDh4N72xTHZMLUZT82"
-model_path = "combinee_cnn.h5"
-download_model_from_google_drive(model_url, model_path)
-classifier = load_model_from_filesystem(model_path)
+temp_model_path = download_model_from_google_drive(model_url)
+classifier = load_model_from_filesystem(temp_model_path)
 
 # Set background image using HTML
 background_image_style = f"""
