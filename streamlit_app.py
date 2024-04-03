@@ -19,6 +19,12 @@ model_file_path = "https://drive.google.com/file/d/1lhBtxhP18L-KA7wDh4N72xTHZMLU
 # Load pretrained model
 classifier = load_model(model_file_path)
 
+# Load the model with error handling
+try:
+    classifier = load_model(model_file_path)
+except Exception as e:
+    st.error(f"Error loading the model: {str(e)}")
+    
 # Set background image using HTML
 background_image_style = f"""
     <style>
