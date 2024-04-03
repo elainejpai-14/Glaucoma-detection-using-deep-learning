@@ -14,7 +14,7 @@ subprocess.run(['pip', 'install', '-r', 'requirements.txt'])
 background_image_url = "https://img.freepik.com/free-photo/security-access-technologythe-scanner-decodes-retinal-data_587448-5015.jpg"
 
 # File path to the uploaded model file
-model_file_path = "C:\\Users\\Elaine M Paily\\Downloads\\combinee_cnn.h5"
+model_file_path = "https://drive.google.com/file/d/1lhBtxhP18L-KA7wDh4N72xTHZMLUZT82/view?usp=drive_link"
 
 # Load pretrained model
 classifier = load_model(model_file_path)
