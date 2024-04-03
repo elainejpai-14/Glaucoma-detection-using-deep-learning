@@ -4,7 +4,8 @@ from PIL import Image
 import numpy as np
 import pandas as pd
 from tensorflow.keras.models import load_model
-import matplotlib.pyplot as plt
+import gdown
+import os
 
 # Function to load and preprocess image
 def preprocess_image(image):
@@ -21,11 +22,22 @@ def predict_glaucoma(image, classifier):
     else:
         return "Normal"
 
-# Define the background image URL
-background_image_url = "https://img.freepik.com/free-photo/security-access-technologythe-scanner-decodes-retinal-data_587448-5015.jpg"
+# Google Drive file ID
+file_id = '1lhBtxhP18L-KA7wDh4N72xTHZMLUZT82'
+
+# Define the destination path for the model file
+model_path = 'combinee_cnn.h5'
+
+# Download the model file from Google Drive
+if not os.path.exists(model_path):
+    url = f'https://drive.google.com/uc?id={file_id}'
+    gdown.download(url, model_path, quiet=False)
 
 # Load pretrained model
-classifier = load_model("C:\\Users\\Elaine M Paily\\Downloads\\combinee_cnn.h5")
+classifier = load_model(model_path)
+
+# Define the background image URL
+background_image_url = "https://img.freepik.com/free-photo/security-access-technologythe-scanner-decodes-retinal-data_587448-5015.jpg"
 
 # Set background image using HTML
 background_image_style = f"""
