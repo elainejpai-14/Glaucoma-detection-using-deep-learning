@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 from tensorflow.keras.models import load_model
 import matplotlib.pyplot as plt
+import requests
 
 # Function to load and preprocess image
 def preprocess_image(image):
@@ -25,10 +26,18 @@ def predict_glaucoma(image, classifier):
     else:
         return "Normal"
 
-# Load pretrained model from Google Drive
+# Download the model from Google Drive
+def download_model_from_google_drive(model_url, destination):
+    session = requests.Session()
+    response = session.get(model_url, stream=True)
+    with open(destination, "wb") as f:
+        for chunk in response.iter_content(chunk_size=1024):
+            if chunk:
+                f.write(chunk)
+
+# Load pretrained model
 @st.cache(allow_output_mutation=True)
-def load_google_drive_model(model_url):
-    model_path = tf.keras.utils.get_file('combinee_cnn.h5', model_url)
+def load_model_from_filesystem(model_path):
     model = load_model(model_path)
     return model
 
@@ -36,8 +45,10 @@ def load_google_drive_model(model_url):
 background_image_url = "https://img.freepik.com/free-photo/security-access-technologythe-scanner-decodes-retinal-data_587448-5015.jpg"
 
 # Load pretrained model from Google Drive
-model_url = "https://drive.google.com/file/d/1lhBtxhP18L-KA7wDh4N72xTHZMLUZT82/view?usp=drive_link"
-classifier = load_google_drive_model(model_url)
+model_url = "https://drive.google.com/uc?export=download&id=1lhBtxhP18L-KA7wDh4N72xTHZMLUZT82"
+model_path = "combinee_cnn.h5"
+download_model_from_google_drive(model_url, model_path)
+classifier = load_model_from_filesystem(model_path)
 
 # Set background image using HTML
 background_image_style = f"""
