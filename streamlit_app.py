@@ -6,8 +6,6 @@ import numpy as np
 import pandas as pd
 from tensorflow.keras.models import load_model
 import matplotlib.pyplot as plt
-import gdown
-import os
 
 # Install dependencies from requirements.txt file
 subprocess.run(['pip', 'install', '-r', 'requirements.txt'])
@@ -15,21 +13,11 @@ subprocess.run(['pip', 'install', '-r', 'requirements.txt'])
 # Define the background image URL
 background_image_url = "https://img.freepik.com/free-photo/security-access-technologythe-scanner-decodes-retinal-data_587448-5015.jpg"
 
-# Download model file from Google Drive using gdown
-model_url = "https://drive.google.com/uc?id=1lhBtxhP18L-KA7wDh4N72xTHZMLUZT82"
-model_file_path = "combinee_cnn.h5"
-
-if not os.path.isfile(model_file_path):
-    try:
-        gdown.download(model_url, model_file_path, quiet=False)
-    except Exception as e:
-        st.error(f"Error downloading the model file: {e}")
+# File path to the uploaded model file
+model_file_path = "C:\\Users\\Elaine M Paily\\Downloads\\combinee_cnn.h5"
 
 # Load pretrained model
-if os.path.isfile(model_file_path):
-    classifier = load_model(model_file_path)
-else:
-    st.error("Model file not found. Please check the download URL.")
+classifier = load_model(model_file_path)
 
 # Set background image using HTML
 background_image_style = f"""
