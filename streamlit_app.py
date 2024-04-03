@@ -30,8 +30,10 @@ if not os.path.exists(model_path):
     url = "https://drive.google.com/file/d/1lhBtxhP18L-KA7wDh4N72xTHZMLUZT82/view?usp=drive_link"
     gdown.download(url, model_path, quiet=False)
 
-# Load pretrained model
-classifier = load_model(model_path)
+if not os.path.exists(model_path):
+    st.error("Model file not found. Please ensure the correct file path.")
+else:
+    classifier = load_model(model_path)
 
 # Define the background image URL
 background_image_url = "https://img.freepik.com/free-photo/security-access-technologythe-scanner-decodes-retinal-data_587448-5015.jpg"
