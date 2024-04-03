@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 from tensorflow.keras.models import load_model
 import matplotlib.pyplot as plt
+import gdown
 
 # Function to load and preprocess image
 def preprocess_image(image):
@@ -28,8 +29,12 @@ def predict_glaucoma(image, classifier):
 # Define the background image URL
 background_image_url = "https://img.freepik.com/free-photo/security-access-technologythe-scanner-decodes-retinal-data_587448-5015.jpg"
 
+# Download model file from Google Drive using gdown
+model_url = "https://drive.google.com/uc?id=1lhBtxhP18L-KA7wDh4N72xTHZMLUZT82"
+gdown.download(model_url, "combinee_cnn.h5", quiet=False)
+
 # Load pretrained model
-classifier = load_model(r"C:\Users\Elaine M Paily\Downloads\combinee_cnn.h5")
+classifier = load_model("combinee_cnn.h5")
 
 # Set background image using HTML
 background_image_style = f"""
