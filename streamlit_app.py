@@ -1,3 +1,4 @@
+import subprocess
 import streamlit as st
 import tensorflow as tf
 from PIL import Image
@@ -6,22 +7,9 @@ import pandas as pd
 from tensorflow.keras.models import load_model
 import matplotlib.pyplot as plt
 import gdown
-import os
 
-# Function to load and preprocess image
-def preprocess_image(image):
-    processed_image = np.array(image.resize((256, 256)))  # Resize to model input size
-    processed_image = processed_image / 255.0  # Normalize pixel values
-    return processed_image
-
-# Function to make glaucoma prediction
-def predict_glaucoma(image, classifier):
-    image = np.expand_dims(image, axis=0)
-    prediction = classifier.predict(image)
-    if prediction[0][0] > prediction[0][1]:
-        return "Glaucoma"
-    else:
-        return "Normal"
+# Install dependencies from requirements.txt file
+subprocess.run(['pip', 'install', '-r', 'requirements.txt'])
 
 # Define the background image URL
 background_image_url = "https://img.freepik.com/free-photo/security-access-technologythe-scanner-decodes-retinal-data_587448-5015.jpg"
@@ -133,4 +121,20 @@ if not all_results.empty:
     bar_data = all_results['Prediction'].value_counts()
     fig, ax = plt.subplots()
     colors = ['green' if label == 'Normal' else 'red' for label in bar_data.index]
-    ax.bar(bar_data.index, bar_data, color
+    ax.bar(bar_data.index, bar_data, color=colors)
+    ax.set_xlabel('Prediction')
+    ax.set_ylabel('Count')
+    st.pyplot(fig)
+
+    # Option to download prediction report
+    st.markdown("---")
+    st.subheader("Download Prediction Report")
+    csv = all_results.to_csv(index=False)
+    st.download_button(
+        label="Download CSV",
+        data=csv,
+        file_name="prediction_report.csv",
+        mime="text/csv"
+    )
+else:
+    st.markdown("<p class='yellow-bg'>No images uploaded yet.</p>", unsafe_allow_html=True)
