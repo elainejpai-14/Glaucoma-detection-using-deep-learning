@@ -1,15 +1,11 @@
-import subprocess
 import streamlit as st
 import tensorflow as tf
 from PIL import Image
 import numpy as np
 import pandas as pd
-import requests
 from tensorflow.keras.models import load_model
-import matplotlib.pyplot as plt
-
-# Install dependencies from requirements.txt file
-subprocess.run(['pip', 'install', '-r', 'requirements.txt'])
+import gdown
+import os
 
 # Function to load and preprocess image
 def preprocess_image(image):
@@ -26,27 +22,22 @@ def predict_glaucoma(image, classifier):
     else:
         return "Normal"
 
-# Check if model file exists, if not download it
-model_file_path = "combinee_cnn.h5"
-model_url = "https://github.com/elainejpai-14/major-project/raw/main/combinee_cnn.h5"
+# Google Drive file ID
+file_id = '1lhBtxhP18L-KA7wDh4N72xTHZMLUZT82'
 
-if not os.path.exists(model_file_path):
-    st.write("Downloading model file...")
-    response = requests.get(model_url)
-    if response.status_code == 200:
-        with open(model_file_path, 'wb') as f:
-            f.write(response.content)
-            st.write("Model file downloaded successfully.")
-    else:
-        st.error("Failed to download the model file.")
+# Define the destination path for the model file
+model_path = 'combinee_cnn.h5'
+
+# Download the model file from Google Drive
+if not os.path.exists(model_path):
+    url = f'https://drive.google.com/uc?id={file_id}'
+    gdown.download(url, model_path, quiet=False)
 
 # Load pretrained model
-try:
-    st.write("Loading the model...")
-    classifier = load_model(model_file_path)
-    st.write("Model loaded successfully.")
-except Exception as e:
-    st.error(f"Error loading the model: {str(e)}")
+classifier = load_model(model_path)
+
+# Define the background image URL
+background_image_url = "https://img.freepik.com/free-photo/security-access-technologythe-scanner-decodes-retinal-data_587448-5015.jpg"
 
 # Set background image using HTML
 background_image_style = f"""
