@@ -11,8 +11,20 @@ import os
 
 # Function to load and preprocess image
 def preprocess_image(image):
-    processed_image = np.array(image.resize((256, 256)))  # Resize to model input size
-    processed_image = processed_image / 255.0  # Normalize pixel values
+    # Convert image to RGB if it has less than 3 channels
+    if image.mode != 'RGB':
+        image = image.convert('RGB')
+    
+    # Resize the image to the model input size
+    image = image.resize((256, 256))
+    
+    # Convert the image to a numpy array and normalize pixel values
+    processed_image = np.array(image) / 255.0
+    
+    # Ensure image has three channels (RGB)
+    if processed_image.shape[-1] != 3:
+        processed_image = np.stack((processed_image,) * 3, axis=-1)
+    
     return processed_image
 
 # Function to make glaucoma prediction
@@ -38,10 +50,16 @@ model_path = 'combinee_cnn.h5'
 # Download the model file from Google Drive
 if not os.path.exists(model_path):
     url = f'https://drive.google.com/uc?id={file_id}'
-    gdown.download(url, model_path, quiet=False)
+    try:
+        gdown.download(url, model_path, quiet=False)
+    except Exception as e:
+        st.error(f"Error downloading the model: {e}")
 
 # Load pretrained model
-classifier = load_model(model_path)
+try:
+    classifier = load_model(model_path)
+except Exception as e:
+    st.error(f"Error loading the model: {e}")
 
 # Define the background image URL
 background_image_url = "https://img.freepik.com/free-photo/security-access-technologythe-scanner-decodes-retinal-data_587448-5015.jpg"
@@ -96,8 +114,25 @@ background_image_style = f"""
 # Display background image using HTML
 st.markdown(background_image_style, unsafe_allow_html=True)
 
-# Set title in dark mode
-st.markdown("<h1 class='blue-bg' style='text-align: center; color: #ecf0f1;'>GlaucoGuard: Gaining Clarity in Glaucoma diagnosis through Deep Learning</h1>", unsafe_allow_html=True)
+# Set title with transition effects and font styling
+st.markdown("""
+    <style>
+        .title {
+            text-align: center;
+            color: #ecf0f1;
+            padding: 20px;
+            font-family: 'Montserrat', sans-serif;
+            
+        }
+
+        @keyframes fadein {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+    </style>
+    <h1 class='title blue-bg'>GlaucoGuard: Gaining Clarity in Glaucoma diagnosis through Deep Learning</h1>
+""", unsafe_allow_html=True)
+
 st.markdown("---")
 
 # Paragraph with content about uploading fundus images
@@ -135,79 +170,71 @@ if st.button("Clear Results"):
 if uploaded_file is not None:
 
     # Display uploaded image
-    original_image = Image.open(uploaded_file)
-    st.image(original_image,  use_column_width=True)
-    st.markdown("<div style='background-color: white; text-align: center; padding: 5px'><strong>Uploaded Image</strong></div>", unsafe_allow_html=True)
-    # Perform glaucoma detection
-    with st.spinner("Detecting glaucoma..."):
-        processed_image = preprocess_image(original_image)
-        prediction = predict_glaucoma(processed_image, classifier)
+    try:
+        original_image = Image.open(uploaded_file)
+        st.image(original_image,  use_column_width=True)
+        st.markdown("<div style='background-color: white; text-align: center; padding: 5px'><strong>Uploaded Image</strong></div>", unsafe_allow_html=True)
+        
+        # Perform glaucoma detection
+        with st.spinner("Detecting glaucoma..."):
+            processed_image = preprocess_image(original_image)
+            prediction = predict_glaucoma(processed_image, classifier)
 
-    # Customize messages based on prediction
-    if prediction == "Glaucoma":
-        st.markdown("<p class='red-bg'>Your eye is diagnosed with Glaucoma. Please consult an ophthalmologist.</p>", unsafe_allow_html=True)
-    else:
-        st.markdown("<p class='green-bg'>Your eyes are healthy.</p>", unsafe_allow_html=True)
+        # Customize messages based on prediction
+        if prediction == "Glaucoma":
+            st.markdown("<p class='red-bg'>Your eye is diagnosed with Glaucoma. Please consult an ophthalmologist.</p>", unsafe_allow_html=True)
+        else:
+            st.markdown("<p class='green-bg'>Your eyes are healthy.</p>", unsafe_allow_html=True)
 
-    # Add new result to DataFrame
+        # Add new result to DataFrame
+        new_result = pd.DataFrame({"Image": [uploaded_file.name], "Prediction": [prediction]})
+        all_results = pd.concat([new_result, all_results], ignore_index=True)
+        
+        if not all_results.empty:
+            st.markdown("<h3  class='blue-bg' style='color: white;'>Detection Results</h3>", unsafe_allow_html=True)
+            st.dataframe(all_results.style.applymap(lambda x: 'color: red' if x == 'Glaucoma' else 'color: green', subset=['Prediction']))
 
-    st.markdown(
-    f"""
-    <style>
-        .dataframe {{
-            background-color: white;
-            width: 100%; /* Set width to 100% */
-            table-layout: fixed;
-            padding: 10px; /* Add padding */
-        }}
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+        # Save updated results to CSV
+        all_results.to_csv("results.csv", index=False)
 
-   
-    new_result = pd.DataFrame({"Image": [uploaded_file.name], "Prediction": [prediction]})
-    all_results = pd.concat([new_result, all_results], ignore_index=True)
-    if not all_results.empty:
-      st.markdown("<h3  class='blue-bg' style='color: white;'>Detection Results</h3>", unsafe_allow_html=True)
-     
-      st.dataframe(all_results.style.applymap(lambda x: 'color: red' if x == 'Glaucoma' else 'color: green', subset=['Prediction']))
+        # Pie chart
+        st.markdown("<h3  style='color: white; background-color: darkblue'>Pie Chart</h3>", unsafe_allow_html=True)
+        pie_data = all_results['Prediction'].value_counts()
+        fig, ax = plt.subplots()
+        colors = ['green' if label == 'Normal' else 'red' for label in pie_data.index]
+        ax.pie(pie_data, labels=pie_data.index, autopct='%1.1f%%', startangle=90, colors=colors)
+        ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+        st.pyplot(fig)
 
-    # Save updated results to CSV
-    all_results.to_csv("results.csv", index=False)
+        # Bar chart
+        st.markdown("<h3   style='color: white; background-color: darkblue'>Bar Chart</h3>", unsafe_allow_html=True)
+        bar_data = all_results['Prediction'].value_counts()
+        fig, ax = plt.subplots()
+        colors = ['green' if label == 'Normal' else 'red' for label in bar_data.index]
+        ax.bar(bar_data.index, bar_data, color=colors)
+        ax.set_xlabel('Prediction')
+        ax.set_ylabel('Count')
+        st.pyplot(fig)
 
-# Display all results in table with black background color
-
-
-    # Pie chart
-    st.markdown("<h3  style='color: white; background-color: blue'>Pie Chart</h3>", unsafe_allow_html=True)
-    pie_data = all_results['Prediction'].value_counts()
-    fig, ax = plt.subplots()
-    colors = ['green' if label == 'Normal' else 'red' for label in pie_data.index]
-    ax.pie(pie_data, labels=pie_data.index, autopct='%1.1f%%', startangle=90, colors=colors)
-    ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-    st.pyplot(fig)
-
-    # Bar chart
-    st.markdown("<h3   style='color: white; background-color: blue'>Bar Chart</h3>", unsafe_allow_html=True)
-    bar_data = all_results['Prediction'].value_counts()
-    fig, ax = plt.subplots()
-    colors = ['green' if label == 'Normal' else 'red' for label in bar_data.index]
-    ax.bar(bar_data.index, bar_data, color=colors)
-    ax.set_xlabel('Prediction')
-    ax.set_ylabel('Count')
-    st.pyplot(fig)
-
-    # Option to download prediction report
-    st.markdown("<h3  class='blue-bg' style='color: white;'>Download Prediction Report</h3>", unsafe_allow_html=True)
-    csv = all_results.to_csv(index=False)
-    st.download_button(
-        label="Download CSV",
-        data=csv,
-        file_name="prediction_report.csv",
-        mime="text/csv"
-    )
+        # Option to download prediction report
+        st.markdown("<h3  class='blue-bg' style='color: white;'>Download Prediction Report</h3>", unsafe_allow_html=True)
+        csv = all_results.to_csv(index=False)
+        st.download_button(
+            label="Download CSV",
+            data=csv,
+            file_name="prediction_report.csv",
+            mime="text/csv"
+        )
+        
+    except Exception as e:
+        st.error(f"Error processing the uploaded image: {e}")
 else:
     st.markdown("<p style='font-size: 20px;  background-color: cyan; color: black;'>No images uploaded yet.</p>", unsafe_allow_html=True)
 
-
+st.markdown("""
+    <div class="white-bg" style="padding: 20px; text-align: center;">
+        <h2>Thank you for using GlaucoGuard!</h2>
+        <p>This application was developed by Chaithanya S , Chinmayi H , Elaine M Paily & Hamsini D .</p>
+        <p>Department of CSE, Vidyavardhaka College of Engineering Mysore</p>
+    </div>
+""", unsafe_allow_html=True)
