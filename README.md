@@ -7,5 +7,5 @@ Datasets Used:
 2. Rim-One: https://www.kaggle.com/datasets/nonatosales/rimone
 3. Acrima: https://www.kaggle.com/datasets/toaharahmanratul/acrima-dataset
 
-User-friendly web application deployed through streamlit (streamlit.py)
+User-friendly web application deployed through streamlit (streamlit.py). 
 Combined dataset used for training (combinee_cnn.h5)
