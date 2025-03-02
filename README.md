@@ -1,4 +1,4 @@
-This project creates and trains a Convolutional Neural Network Model on three publically available datasets: DRISHTI, ACRIMA and RIMONE to identify and classify fundus images of the eye into glaucomateous and non-glaucomateous with an accuracy of 96.18%.
+This project creates and trains a Convolutional Neural Network(CNN) Model on three publically available datasets: DRISHTI, ACRIMA and RIMONE to identify and classify fundus images of the eye into glaucomateous and non-glaucomateous with an accuracy of 96.18%.
 
 Application demonstrating the Glaucoma detection model:- https://majorproject-hjzugm6dsdcf8rwfvpgcsn.streamlit.app/
 
